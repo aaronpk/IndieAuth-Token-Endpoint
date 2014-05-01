@@ -67,6 +67,7 @@ $app->get('/token', function() use($app) {
   $app->response()->headers()->set('Content-Type', 'application/x-www-form-urlencoded');
 
   $tokenString = false;
+  $error_description = false;
   $authHeader = $app->request()->headers()->get('Authorization');
   if(preg_match('/Bearer (.+)/', $authHeader, $match)) {
     $tokenString = $match[1];
@@ -75,7 +76,6 @@ $app->get('/token', function() use($app) {
   if($tokenString) {
     try {
       $token = JWT::decode($tokenString, Config::$jwtKey);
-      $error_description = false;
     } catch(Exception $e) {
       $token = false;
       $error_description = 'The token provided was malformed';
