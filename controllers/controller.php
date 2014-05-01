@@ -67,6 +67,8 @@ $app->get('/token', function() use($app) {
   $app->response()->headers()->set('Content-Type', 'application/x-www-form-urlencoded');
 
   $tokenString = false;
+  $error_description = false;
+  
   $authHeader = $app->request()->headers()->get('Authorization');
   if(preg_match('/Bearer (.+)/', $authHeader, $match)) {
     $tokenString = $match[1];
