@@ -46,13 +46,6 @@ function normalizeMeURL($url) {
   return build_url($me);
 }
 
-function session($key) {
-  if(array_key_exists($key, $_SESSION))
-    return $_SESSION[$key];
-  else
-    return null;
-}
-
 function k($a, $k, $default=null) {
   if(is_array($k)) {
     $result = true;
@@ -69,3 +62,10 @@ function k($a, $k, $default=null) {
       return $default;
   }
 }
+
+function render($page, $data) {
+  global $app;
+  ob_start();
+  $app->render('layout.php', array_merge($data, array('page' => $page)));
+  return ob_get_clean();
+};

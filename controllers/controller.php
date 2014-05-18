@@ -1,7 +1,12 @@
 <?php
 
-$app->get('/', function() use($app) {
-  $app->response()->body('<h1>IndieAuth Token Endpoint</h1><p><a href="https://github.com/aaronpk/IndieAuth-Token-Endpoint">Source Code</a></p>');
+$app->get('/', function($format='html') use($app) {
+  $res = $app->response();
+
+  $html = render('index', array(
+    'title' => 'IndieAuth Token Endpoint'
+  ));
+  $res->body($html);
 });
 
 // Exchange an authorization code for an access token

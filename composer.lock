@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "a5a43642e9beee69ce3118ce073f62d9",
+    "hash": "12797a23b9410962dd38865f1c338af3",
     "packages": [
         {
             "name": "firebase/php-jwt",
@@ -181,41 +181,6 @@
             "time": "2013-10-20 12:25:50"
         },
         {
-            "name": "saltybeagle/savant3",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/saltybeagle/Savant3.git",
-                "reference": "ebf4385bf44bec8c7a169571ac178f626017c466"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/saltybeagle/Savant3/zipball/ebf4385bf44bec8c7a169571ac178f626017c466",
-                "reference": "ebf4385bf44bec8c7a169571ac178f626017c466",
-                "shasum": ""
-            },
-            "type": "library",
-            "autoload": {
-                "classmap": [
-                    "Savant3.php",
-                    "Savant3",
-                    "Savant3/resources"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "LGPL"
-            ],
-            "authors": [
-                {
-                    "name": "Brett Bieber",
-                    "email": "brett.bieber@gmail.com"
-                }
-            ],
-            "description": "Savant3 template engine",
-            "time": "2014-01-07 17:10:32"
-        },
-        {
             "name": "slim/slim",
             "version": "2.4.3",
             "source": {
@@ -270,7 +235,6 @@
     ],
     "minimum-stability": "stable",
     "stability-flags": {
-        "saltybeagle/savant3": 20,
         "firebase/php-jwt": 20
     },
     "platform": [
