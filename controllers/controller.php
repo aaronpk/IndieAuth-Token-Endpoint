@@ -45,9 +45,10 @@ $app->post('/token', function() use($app) {
     // $auth['scope']
 
     $token_data = array(
-      'date_issued' => date('Y-m-d H:i:s'),
       'me' => $auth['me'],
+      'issued_by' => 'https://' . Config::$hostname . '/token',
       'client_id' => $params['client_id'],
+      'issued_at' => time(),
       'scope' => array_key_exists('scope', $auth) ? $auth['scope'] : '',
       'nonce' => mt_rand(1000000,pow(2,30))
     );
@@ -83,12 +84,7 @@ $app->get('/token', function() use($app) {
     }
 
     if($token) {
-      $app->response()->body(http_build_query(array(
-        'me' => $token->me,
-        'scope' => $token->scope,
-        'client_id' => $token->client_id,
-        'issued' => strtotime($token->date_issued),
-      )));
+      $app->response()->body(http_build_query($token));
       return;
     }
   }
