@@ -39,6 +39,7 @@ Content-type: application/x-www-form-urlencoded
 Authorization: Bearer xxxxxxxx</pre></p>
 
   <p>The token endpoint will verify the token and the response will include information about the user and scope of the token.</p>
+  <p>The scope value will be a space-separated list of strings representing all the scopes that were granted. It may also be blank or contain just one value.</p>
 
   <p><pre>HTTP/1.1 200 OK
 Content-Type: application/x-www-form-urlencoded
