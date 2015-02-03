@@ -40,11 +40,11 @@ $app->post('/token', function() use($app) {
   }
 
   // Now verify the authorization code by querying the endpoint
-  $auth = IndieAuth\Client::verifyIndieAuthCode($authorizationEndpoint, $params['code'], $params['me'], $params['redirect_uri'], $params['client_id'], $params['state']);
+  $auth = IndieAuth\Client::verifyIndieAuthCode($authorizationEndpoint, k($params, 'code'), k($params, 'me'), k($params, 'redirect_uri'), k($params, 'client_id'), k($params, 'state'));
 
   if(array_key_exists('error', $auth)) {
     $app->response()->body(http_build_query($auth));
-  } else {
+  } elseif(array_key_exists('me', $auth)) {
     // Token is valid!
     // $auth['me']
     // $auth['scope']
@@ -54,7 +54,7 @@ $app->post('/token', function() use($app) {
       'issued_by' => 'https://' . Config::$hostname . '/token',
       'client_id' => $params['client_id'],
       'issued_at' => time(),
-      'scope' => array_key_exists('scope', $auth) ? $auth['scope'] : '',
+      'scope' => k($auth, 'scope', ''),
       'nonce' => mt_rand(1000000,pow(2,30))
     );
     $token = JWT::encode($token_data, Config::$jwtKey);
@@ -64,12 +64,28 @@ $app->post('/token', function() use($app) {
       'scope' => $token_data['scope'],
       'access_token' => $token
     )));
+  } else {
+    $app->response()->body(http_build_query(array(
+      'error' => 'unknown_error',
+      'error_description' => 'There was an unknown error verifying the authorization code.',
+      'auth_response' => $auth
+    )));
   }
 });
 
 // Used by the Micropub endpoint to verify an access token
 $app->get('/token', function() use($app) {
   $req = $app->request();
+
+  // Return a regular HTML page if no token was sent
+  if($app->request()->headers()->get('Authorization') == '') {
+    $html = render('index', array(
+      'title' => 'IndieAuth Token Endpoint'
+    ));
+    $app->response()->body($html);
+    return;
+  }
+
   $app->response()->headers()->set('Content-Type', 'application/x-www-form-urlencoded');
 
   $tokenString = false;
@@ -95,7 +111,6 @@ $app->get('/token', function() use($app) {
   }
 
   $app->response()->setStatus(400);
-  $app->response()->headers()->set('Content-Type', 'application/x-www-form-urlencoded');
   $app->response()->body(http_build_query(array(
     'error' => 'unauthorized',
     'error_description' => ($error_description ?: 'An access token is required. Send an HTTP Authorization header such as \'Authorization: Bearer xxxxxx\'')
