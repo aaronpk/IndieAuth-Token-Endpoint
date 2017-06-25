@@ -35,20 +35,22 @@ content=Hello World!</pre></p>
   <p>Your Micropub endpoint can query the token endpoint to verify the access token given. To verify the access token, make a GET request to the token endpoint with the access token in the header:</p>
 
   <p><pre>GET https://tokens.indieauth.com/token
-Content-type: application/x-www-form-urlencoded
+Accept: application/json
 Authorization: Bearer xxxxxxxx</pre></p>
 
   <p>The token endpoint will verify the token and the response will include information about the user and scope of the token.</p>
   <p>The scope value will be a space-separated list of strings representing all the scopes that were granted. It may also be blank or contain just one value.</p>
 
   <p><pre>HTTP/1.1 200 OK
-Content-Type: application/x-www-form-urlencoded
+Content-Type: application/json
 
-me=https://aaronparecki.com/&amp;
-client_id=https://ownyourgram.com&amp;
-scope=post&amp;
-issued_at=1399155608&amp;
-nonce=501884823</pre></p>
+{
+  "me": "https://aaronparecki.com/",
+  "client_id": "https://ownyourgram.com",
+  "scope": "post",
+  "issued_at": 1399155608,
+  "nonce": 501884823
+}</pre></p>
 
   <p>Your Micropub endpoint can inspect the values and use them to determine whether to proceed with processing the request. For example, for a Micropub endpoint for posting notes to your own site, you would likely only accept requests where the "me" value is your own site.</p>
 

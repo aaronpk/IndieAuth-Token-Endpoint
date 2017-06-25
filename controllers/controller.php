@@ -87,7 +87,10 @@ $app->get('/token', function() use($app) {
     return;
   }
 
-  $app->response()->headers()->set('Content-Type', 'application/x-www-form-urlencoded');
+  $content_type = 'application/x-www-form-urlencoded';
+  if($app->request()->headers()->get('Accept') == 'application/json') {
+    $content_type = 'application/json';
+  }
 
   $tokenString = false;
   $error_description = false;
@@ -106,15 +109,23 @@ $app->get('/token', function() use($app) {
     }
 
     if($token) {
-      $app->response()->body(http_build_query($token));
+      $app->response()->headers()->set('Content-Type', $content_type);
+      if($content_type == 'application/json')
+        $app->response()->body(json_encode($token));
+      else
+        $app->response()->body(http_build_query($token));
       return;
     }
   }
 
   $app->response()->setStatus(400);
-  $app->response()->body(http_build_query(array(
+  $error = array(
     'error' => 'unauthorized',
     'error_description' => ($error_description ?: 'An access token is required. Send an HTTP Authorization header such as \'Authorization: Bearer xxxxxx\'')
-  )));
+  );
+  if($content_type == 'application/json')
+    $app->response()->body(json_encode($error));
+  else
+    $app->response()->body(http_build_query($error));
 });
 
