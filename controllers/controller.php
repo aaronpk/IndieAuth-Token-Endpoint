@@ -1,4 +1,5 @@
 <?php
+use Firebase\JWT\JWT;
 
 $app->get('/', function($format='html') use($app) {
   $res = $app->response();
@@ -40,7 +41,7 @@ $app->post('/token', function() use($app) {
   }
 
   // Now verify the authorization code by querying the endpoint
-  $auth = IndieAuth\Client::verifyIndieAuthCode($authorizationEndpoint, k($params, 'code'), k($params, 'me'), k($params, 'redirect_uri'), k($params, 'client_id'), k($params, 'state'));
+  $auth = IndieAuth\Client::verifyIndieAuthCode($authorizationEndpoint, k($params, 'code'), k($params, 'me'), k($params, 'redirect_uri'), k($params, 'client_id'));
 
   if(array_key_exists('error', $auth)) {
     $app->response()->body(http_build_query($auth));
@@ -98,7 +99,7 @@ $app->get('/token', function() use($app) {
 
   if($tokenString) {
     try {
-      $token = JWT::decode($tokenString, Config::$jwtKey);
+      $token = JWT::decode($tokenString, Config::$jwtKey, ['HS256']);
     } catch(Exception $e) {
       $token = false;
       $error_description = 'The token provided was malformed';

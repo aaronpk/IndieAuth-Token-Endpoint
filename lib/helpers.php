@@ -35,10 +35,6 @@ function normalizeMeURL($url) {
   if(!in_array($me['scheme'], array('http','https')))
     return false;
 
-  // Invalid path
-  if($me['path'] != '/')
-    return false;
-
   // query and fragment not allowed
   if(array_key_exists('query', $me) || array_key_exists('fragment', $me))
     return false;
