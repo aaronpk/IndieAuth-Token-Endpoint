@@ -72,16 +72,17 @@ Content-Type: application/json
 
   <p>To test your Micropub endpoint, you will need to find a Micropub client that you can try to sign in to.</p>
 
-  <p><a href="http://ownyourgram.com/">OwnYourGram.com</a> is a great resource for testing, as it includes documentation and debugging information throughout each step of the login process.</p>
+  <p><a href="https://ownyourgram.com/">OwnYourGram.com</a> is a great resource for testing, as it includes documentation and debugging information throughout each step of the login process.</p>
 
 
 
   <h2 id="more"><a href="#more" class="glyphicon glyphicon-link anchor"></a>More Info</h2>
 
   <ul>
-    <li><a href="http://indiewebcamp.com/micropub">Micropub on indiewebcamp.com</a></li>
+    <li><a href="https://indieauth.spec.indieweb.org/">IndieAuth spec</a></li>
+    <li><a href="https://indieweb.org/micropub">Micropub on indieweb.org</a></li>
     <li><a href="https://indieauth.com/">IndieAuth.com</a></li>
-    <li><a href="http://ownyourgram.com/creating-a-token-endpoint">Creating your own token endpoint</a></li>
+    <li><a href="https://indieweb.org/token-endpoint#Creating_a_token_endpoint">Creating your own token endpoint</a></li>
   </ul>
 
 
