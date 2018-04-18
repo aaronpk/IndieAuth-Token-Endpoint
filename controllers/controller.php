@@ -75,7 +75,8 @@ $app->post('/token', function() use($app) {
     $app->response()->body(format_response([
       'me' => $auth['me'],
       'scope' => $token_data['scope'],
-      'access_token' => $token
+      'access_token' => $token,
+      'token_type' => 'Bearer'
     ], $content_type));
   } else {
     $app->response()->body(format_response([
