@@ -53,7 +53,10 @@ $app->post('/token', function() use($app) {
   ];
 
   if(isset($log_params['request']['code']))
-    $log_params['request']['code'] = str_repeat('*', strlen($log_params['request']['code']));
+    $log_params['request']['code'] = '*** '.strlen($log_params['request']['code']).' ***';
+
+  if(isset($log_params['request']['code_verifier']))
+    $log_params['request']['code_verifier'] = '*** '.strlen($log_params['request']['code_verifier']).' ***';
 
   if(array_key_exists('me', $params)) {
     $me = IndieAuth\Client::normalizeMeURL($params['me']);
