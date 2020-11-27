@@ -2,6 +2,7 @@
   "require": {
     "indieauth/client": "^0.2.1",
     "slim/slim": "2.*",
-    "firebase/php-jwt": "dev-master"
+    "firebase/php-jwt": "dev-master",
+    "monolog/monolog": "^2.1"
   }
 }

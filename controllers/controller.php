@@ -1,11 +1,23 @@
 <?php
 use Firebase\JWT\JWT;
 
+use Monolog\Logger;
+use Monolog\Handler\StreamHandler;
+
+$log = new Logger('name');
+$log->pushHandler(new StreamHandler('logs/app.log', Logger::INFO));
+
+function log_info($message, $data) {
+  global $log;
+  $log->info($message, $data);
+}
+
+
 function format_response($data, $content_type) {
   if($content_type == 'application/json')
     return json_encode($data);
   else
-    return http_build_query($data);  
+    return http_build_query($data);
 }
 
 $app->get('/', function($format='html') use($app) {
@@ -22,41 +34,61 @@ $app->post('/token', function() use($app) {
 
   $req = $app->request();
 
-  $content_type = 'application/x-www-form-urlencoded';
-  if($app->request()->headers()->get('Accept') == 'application/json') {
+  $accept = $app->request()->headers()->get('Accept');
+
+  // bad conneg. if they mention json at all, send json.
+  // this defaults to form encoded for clients that don't send a header for legacy client support.
+  if(strpos($accept, 'application/json') !== false)
     $content_type = 'application/json';
-  }
+  else
+    $content_type = 'application/x-www-form-urlencoded';
+
   $app->response()->headers()->set('Content-Type', $content_type);
 
   $params = $req->params();
-  
-  // the "me" parameter is user input, and may be in a couple of different forms:
-  // aaronparecki.com http://aaronparecki.com http://aaronparecki.com/
-  // Normlize the value now (move this into a function in IndieAuth\Client later)
-  if(!array_key_exists('me', $params) || !($me = IndieAuth\Client::normalizeMeURL($params['me']))) {
-    $app->response()->body(format_response([
-      'error' => 'invalid_parameter',
-      'error_description' => 'The "me" parameter provided was not valid'
-    ], $content_type));
-    return;
+
+
+  $log_params = [
+    'request' => $params
+  ];
+
+  if(isset($log_params['request']['code']))
+    $log_params['request']['code'] = str_repeat('*', strlen($log_params['request']['code']));
+
+  if(array_key_exists('me', $params)) {
+    $me = IndieAuth\Client::normalizeMeURL($params['me']);
+
+    if(!$me) {
+      $app->response()->body(format_response([
+        'error' => 'invalid_parameter',
+        'error_description' => 'The "me" parameter provided was not valid'
+      ], $content_type));
+      return;
+    }
+
+    // Try to discover the authorization endpoint for this user
+    $authorizationEndpoint = IndieAuth\Client::discoverAuthorizationEndpoint($me);
+
+    if(!$authorizationEndpoint) {
+      $app->response()->body(format_response([
+        'error' => 'missing_authorization_endpoint',
+        'error_description' => 'No authorization endpoint was discovered'
+      ], $content_type));
+      return;
+    }
+  } else {
+    $authorizationEndpoint = 'https://indieauth.com/auth';
   }
 
-  // Try to discover the authorization endpoint for this user
-  $authorizationEndpoint = IndieAuth\Client::discoverAuthorizationEndpoint($me);
-
-  if(!$authorizationEndpoint) {
-    $app->response()->body(format_response([
-      'error' => 'missing_authorization_endpoint',
-      'error_description' => 'No authorization endpoint was discovered'
-    ], $content_type));
-    return;
-  }
+  $log_params['Accept'] = $accept;
+  $log_params['authorization_endpoint'] = $authorizationEndpoint;
+  log_info('Token Request', $log_params);
 
   // Now verify the authorization code by querying the endpoint
   $auth = IndieAuth\Client::verifyIndieAuthCode($authorizationEndpoint, k($params, 'code'), k($params, 'me'), k($params, 'redirect_uri'), k($params, 'client_id'));
 
   if(array_key_exists('error', $auth)) {
-    $app->response()->body(http_build_query($auth));
+    $app->response()->body(format_response($auth, $content_type));
   } elseif(array_key_exists('me', $auth)) {
     // Token is valid!
     // $auth['me']
@@ -108,7 +140,7 @@ $app->get('/token', function() use($app) {
 
   $tokenString = false;
   $error_description = false;
-  
+
   $authHeader = $app->request()->headers()->get('Authorization');
   if(preg_match('/Bearer (.+)/', $authHeader, $match)) {
     $tokenString = $match[1];
